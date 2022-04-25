@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "HtmlTestValidator.Console": {
+      "commandName": "Project",
+      "commandLineArgs": "c:\\Work\\Jedlik\\@@\\AgazatiKESZ\\The_Game_Awards_2021.json c:\\Work\\Jedlik\\@@\\AgazatiKESZ\\Megoldas\\ "
+    }
+  }
+}

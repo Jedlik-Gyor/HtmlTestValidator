@@ -152,8 +152,6 @@ namespace HtmlTestValidator.Models.Project
 
         public bool Assert(string path)
         {
-
-
             using (var client = new HttpClient())
             {
                 client.DefaultRequestHeaders.Add("User-Agent", "C# App");

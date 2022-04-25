@@ -47,10 +47,11 @@ namespace HtmlTestValidator
                                 evaluation => evaluation.Evaluate(project));
 
                 evaluationSheet = new EvaluationSheet(project, evaluations);
-                evaluationSheet.SaveAs("teszt.xlsx");
+                var fileName = $"teszt{DateTime.Now:yyyy-mm-dd HH.mm.ss}.xlsx";
+                evaluationSheet.SaveAs(fileName);
 
                 evaluationSheet.Dispose();
-                Process.Start(new ProcessStartInfo("teszt.xlsx") { UseShellExecute = true });
+                Process.Start(new ProcessStartInfo(fileName) { UseShellExecute = true });
             }
         }
 
