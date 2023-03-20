@@ -8,6 +8,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace HtmlTestValidator.Models.Project
@@ -110,6 +111,26 @@ namespace HtmlTestValidator.Models.Project
         }
     }
 
+    public class AssertionRegex : Assertion 
+    {
+        [JsonProperty("actual")]
+        public AssertActual Actual { get; set; }
+
+        [JsonProperty("pattern")]
+        public string Pattern { get; set; }
+
+        public override bool Assert(IWebElement webElement)
+        {
+            var actualValue = Actual.GetValue(webElement);
+            return Regex.Match(actualValue, Pattern, RegexOptions.IgnoreCase).Success;
+        }
+
+        public override bool Assert(ReadOnlyCollection<IWebElement> webElement)
+        {
+            return false;
+        }
+    }
+
     public class AssertionHtmlValidation : Assertion
     {
         [JsonProperty("actual")]
@@ -143,7 +164,6 @@ namespace HtmlTestValidator.Models.Project
             throw new NotImplementedException();
         }
     }
-
 
     public class AssertionCssValidation : Assertion
     {
@@ -183,6 +203,7 @@ namespace HtmlTestValidator.Models.Project
 
 
     }
+
     public class AssertionClassConverter : DefaultContractResolver
     {
         protected override JsonConverter ResolveContractConverter(Type objectType)
@@ -211,6 +232,8 @@ namespace HtmlTestValidator.Models.Project
                 return JsonConvert.DeserializeObject<AssertionCount>(jo.ToString(), SpecifiedSubclassConversion);
             if (jo["operation"].Value<string>() == "contains")
                 return JsonConvert.DeserializeObject<AssertionContains>(jo.ToString(), SpecifiedSubclassConversion);
+            if (jo["operation"].Value<string>() == "regex")
+                return JsonConvert.DeserializeObject<AssertionRegex>(jo.ToString(), SpecifiedSubclassConversion);
             if (jo["operation"].Value<string>() == "isempty")
                 return JsonConvert.DeserializeObject<AssertionEmpty>(jo.ToString(), SpecifiedSubclassConversion);
             if (jo["operation"].Value<string>() == "htmlvalidation")

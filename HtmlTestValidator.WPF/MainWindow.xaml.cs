@@ -1,11 +1,13 @@
 ﻿using HtmlTestValidator.Models;
 using HtmlTestValidator.Models.Project;
+using Microsoft.Win32;
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Forms;
 
 namespace HtmlTestValidator
 {
@@ -25,12 +27,16 @@ namespace HtmlTestValidator
 
         private void btnSelectTaskJsonPath_Click(object sender, RoutedEventArgs e)
         {
-
+            var openFileDialog = new Microsoft.Win32.OpenFileDialog();
+            if (openFileDialog.ShowDialog() == true)
+                txtTaskJsonPath.Text = File.ReadAllText(openFileDialog.FileName);
         }
 
         private void btnSelectTestsParentFolder_Click(object sender, RoutedEventArgs e)
         {
-
+            using (var dialog = new FolderBrowserDialog())
+                if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                    txtTestParentFolder.Text = dialog.SelectedPath;
         }
 
         private void btnStart_Click(object sender, RoutedEventArgs e)
