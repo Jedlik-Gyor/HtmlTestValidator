@@ -49,6 +49,9 @@ namespace HtmlTestValidator.Models
                 //element = driver.FindElement(By.XPath("//head/link[@rel='stylesheet'][2][contains(@href, 'style.css')]"));
 
 
+                foreach (var beforeOperation in project.BeforeOperations)
+                    beforeOperation.DoIt(this.path);
+
                 foreach (var (step, index) in project.Steps.Select((value, i) => (value, i)))
                 {
                     var passes = 0;

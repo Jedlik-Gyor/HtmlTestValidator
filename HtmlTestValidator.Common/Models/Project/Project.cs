@@ -22,6 +22,9 @@ namespace HtmlTestValidator.Models.Project
         [JsonProperty("steps")]
         public Steps[] Steps { get; set; }
 
+        [JsonProperty("beforeOpertations")]
+        public Operation[] BeforeOperations { get; set; }
+
 
         public static Project ReadFromFile(string path)
         {
