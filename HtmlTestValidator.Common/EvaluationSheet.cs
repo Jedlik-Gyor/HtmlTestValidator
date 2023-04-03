@@ -339,6 +339,15 @@ namespace HtmlTestValidator
             foreach (var evaluation in evaluations)
             {
                 sheetData.Append(
+                    evaluation.StepErrors.Select((p, i) => new Comment() {
+                        Reference = GetCellReference((int)rowIndex, i + 4),
+                        AuthorId = 0,
+                        CommentText = new CommentText(new Run()
+                        {
+                            Text = new Text(p ?? "")
+                        })
+                    }));
+                sheetData.Append(
                    new Row(
                        new List<Cell>()
                        {
@@ -369,7 +378,7 @@ namespace HtmlTestValidator
                                CellReference = GetCellReference((int)rowIndex, i + 4),
                                CellValue = new CellValue(evaluation.Presenced ? p.ToString() : ""),
                                DataType = CellValues.Number,
-                               StyleIndex = 9
+                               StyleIndex = 9,
                            })
                        ).Union(
                            new List<Cell>()
@@ -391,7 +400,7 @@ namespace HtmlTestValidator
                                      CellReference = GetCellReference((int)rowIndex,  6 + project.Steps.Length),
                                      CellFormula = new CellFormula($"IF({GetCellReference((int)rowIndex, 2)}=\"ü\", SUM({GetCellReference((int)rowIndex, 3)}:{GetCellReference((int)rowIndex, 5 + project.Steps.Length)}), \"\")"),
                                      DataType = CellValues.Number,
-                                     StyleIndex = 10,                                     
+                                     StyleIndex = 10,
                                  },
                                  new Cell()
                                  {
@@ -421,24 +430,36 @@ namespace HtmlTestValidator
         {
             sheetData.Append(
                 new Row(
-                    new Cell()
+                    new List<Cell>()
                     {
-                        CellReference = GetCellReference(5 + evaluations.Count, 1),
-                        CellFormula = new CellFormula($"COUNTA({GetCellReference(5, 1)}:{GetCellReference(4 + evaluations.Count, 1)})"),
-                        DataType = CellValues.Number,
-                        StyleIndex = 17
-                    },
-                    new Cell()
-                    {
-                        CellReference = GetCellReference(5 + evaluations.Count, 2),
-                        CellFormula = new CellFormula($"COUNTA({GetCellReference(5, 2)}:{GetCellReference(4 + evaluations.Count, 2)})"),
-                        DataType = CellValues.Number,
-                        StyleIndex = 17
-                    }
-                )
+                        new Cell()
+                        {
+                            CellReference = GetCellReference(5 + evaluations.Count, 1),
+                            CellFormula = new CellFormula($"COUNTA({GetCellReference(5, 1)}:{GetCellReference(4 + evaluations.Count, 1)})"),
+                            DataType = CellValues.Number,
+                            StyleIndex = 17
+                        },
+                        new Cell()
+                        {
+                            CellReference = GetCellReference(5 + evaluations.Count, 2),
+                            CellFormula = new CellFormula($"COUNTA({GetCellReference(5, 2)}:{GetCellReference(4 + evaluations.Count, 2)})"),
+                            DataType = CellValues.Number,
+                            StyleIndex = 17
+                        }
+                    }.Union(
+                        evaluations.First().StepPoints.Select((p, i) => new Cell()
+                        {
+                            CellReference = GetCellReference(5 + evaluations.Count, i + 4),
+                            CellFormula = new CellFormula($"COUNTIF({GetCellReference(5, i + 4)}:{GetCellReference(4 + evaluations.Count, i + 4)}, 1)"),
+                            DataType = CellValues.Number,
+                            StyleIndex = 17
+                        })
+                    )
+                    )
                 {
                     RowIndex = (uint)(5 + evaluations.Count)
                 }
+
             );
 
             sheetData.Append(

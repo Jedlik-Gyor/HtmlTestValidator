@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using DocumentFormat.OpenXml.Bibliography;
+using DocumentFormat.OpenXml.Drawing;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 using OpenQA.Selenium;
@@ -13,14 +15,34 @@ namespace HtmlTestValidator.Models.Project
     [JsonConverter(typeof(ActionConverter))]
     public abstract class Action
     {
-        public abstract void DoIt(WebDriver webDriver, IWebElement webElement);
+      
+        public abstract object DoIt(WebDriver webDriver, IWebElement webElement);
 
         public class ActionMoveToElement: Action
         {
-            public override void DoIt(WebDriver webDriver, IWebElement webElement)
+            public override object DoIt(WebDriver webDriver, IWebElement webElement)
             {
                 var actions = new OpenQA.Selenium.Interactions.Actions(webDriver);                
                 actions.MoveToElement(webElement).Perform();
+                return null;
+            }
+        }
+
+        public class ActionExecuteScript : Action
+        {
+            [JsonProperty("execute")]
+            public string Code { get; set; }
+          
+
+            public override object DoIt(WebDriver webDriver, IWebElement webElement)
+            {
+                try
+                {
+                    return ((IJavaScriptExecutor)webDriver).ExecuteScript(this.Code);
+                } catch
+                {
+                    return null;
+                }
             }
         }
 
@@ -46,8 +68,10 @@ namespace HtmlTestValidator.Models.Project
             public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
             {
                 JObject jo = JObject.Load(reader);
-                if (jo["action"].Value<string>() == "moveToElement")
+                if (jo.ContainsKey("action") && jo["action"].Value<string>() == "moveToElement")
                     return JsonConvert.DeserializeObject<ActionMoveToElement>(jo.ToString(), SpecifiedSubclassConversion);
+                if (jo.ContainsKey("execute"))
+                    return JsonConvert.DeserializeObject<ActionExecuteScript>(jo.ToString(), SpecifiedSubclassConversion);
 
                 throw new NotImplementedException();
             }

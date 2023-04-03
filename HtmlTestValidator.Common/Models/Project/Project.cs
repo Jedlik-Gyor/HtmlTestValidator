@@ -21,8 +21,12 @@ namespace HtmlTestValidator.Models.Project
 
         [JsonProperty("steps")]
         public Steps[] Steps { get; set; }
-
-
+        
+        [JsonProperty("npmStartDir")]
+        public string NpmStartDir { get; set; }
+        
+        [JsonProperty("localStartDir")]
+        public string LocalStartDir { get; set; }
         public static Project ReadFromFile(string path)
         {
             var content = File.ReadAllText(path);            

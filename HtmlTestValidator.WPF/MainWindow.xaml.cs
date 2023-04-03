@@ -53,16 +53,21 @@ namespace HtmlTestValidator
             }
             catch (Exception ex)
             {
-                messageBar.Error($"Json beolvaási hiba: {ex.Message}");
+                messageBar.Error($"Json beolvasási hiba: {ex.Message}");
                 return;
             }
             var evaluations = Directory.GetDirectories(txtTestParentFolder.Text)
                                        .Select(d => new Evaluation(d, project.Steps.Length))
                                        .ToList();
 
-            Parallel.ForEach(evaluations,
-                             new ParallelOptions { MaxDegreeOfParallelism = 5 },
-                             evaluation => evaluation.Evaluate(project));
+            /*Parallel.ForEach(evaluations,
+                             new ParallelOptions { MaxDegreeOfParallelism = 3 },
+                             evaluation => evaluation.Evaluate(project));*/
+            foreach (var evaluation in evaluations)
+            {
+                evaluation.Evaluate(project);
+            }
+            
 
             evaluationSheet = new EvaluationSheet(project, evaluations);
             evaluationSheet.SaveAs("teszt.xlsx");
