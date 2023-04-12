@@ -45,14 +45,23 @@ namespace HtmlTestValidator.Models.Project
 
         public override bool AssertWebElement(IWebElement webElement, object result = null)
         {
-            string value;
-            if (result == null)
-            { 
-                value = Actual.GetValue(webElement).ToLower();
-            } else {
-                value = result.ToString().ToLower();
+            try
+            {
+                string value;
+                if (result == null)
+                {
+                    value = Actual.GetValue(webElement).ToLower();
+                }
+                else
+                {
+                    value = result.ToString().ToLower();
+                }
+                return Expected.Replace("$$ProjectName", this.ProjectName).ToLower().CompareTo(value) == 0;
+            } 
+            catch
+            {
+                return false;
             }
-            return Expected.Replace("$$ProjectName", this.ProjectName).ToLower().CompareTo(value) == 0;
         }
 
         public override bool AssertWebElement(ReadOnlyCollection<IWebElement> webElement, object result = null)

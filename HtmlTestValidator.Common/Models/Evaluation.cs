@@ -68,7 +68,7 @@ namespace HtmlTestValidator.Models
 
         public void Evaluate(Project.Project project)
         {
-            Thread.Sleep(new Random().Next(800, 2000));
+            if (this.useNpm) Thread.Sleep(new Random().Next(800, 2000));
             LogHeaderWriteLine("Evaulation start...");
             try
             {
@@ -137,8 +137,8 @@ namespace HtmlTestValidator.Models
                 this.npmProcess.BeginOutputReadLine();
                 LogHeaderWriteLine("node running...");
             }
-            
-            Thread.Sleep(1000);
+
+            if (this.useNpm) Thread.Sleep(1000);
             
             using (var driver = new ChromeDriver(this.headLessChromeOption))
             //using (var driver = new FirefoxDriver(this.firefoxOption))
@@ -153,7 +153,7 @@ namespace HtmlTestValidator.Models
                     }
                 );
                 LogHeaderWriteLine("Steps...");
-                Thread.Sleep(5000);
+                if (this.useNpm) Thread.Sleep(3000);
                 foreach (var (step, index) in project.Steps.Select((value, i) => (value, i)))
                 {
                     var passes = 0;
