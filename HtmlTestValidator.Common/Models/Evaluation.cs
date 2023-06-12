@@ -24,7 +24,7 @@ namespace HtmlTestValidator.Models
 
         public Evaluation(string path, int numberOfSteps)
         {
-            this.path = path.Replace('\\', '/');
+            this.path = path.Replace('\\', '/').Replace("#", "%23");
             this.Name = Path.GetFileName(path);
             StepPoints = new double[numberOfSteps];
             StepErrors = new string[numberOfSteps];
