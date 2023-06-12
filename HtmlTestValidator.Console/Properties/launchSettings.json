@@ -2,7 +2,7 @@
   "profiles": {
     "HtmlTestValidator.Console": {
       "commandName": "Project",
-      "commandLineArgs": "c:\\Work\\Jedlik\\@@\\AgazatiKESZ\\The_Game_Awards_2021.json c:\\Work\\Jedlik\\@@\\AgazatiKESZ\\Megoldas\\ "
+      "commandLineArgs": "\"h:\\100 Tanárok\\Balogh Bence\\22-23\\10A_Programozási_Alapok\\#AutoJavitas_HMTL\\ingatlanpiac.json\" \"c:\\temp\\@@\\megoldasok\"  "
     }
   }
 }
