@@ -1,7 +1,9 @@
 ﻿using HtmlTestValidator.Models.Project;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.Remote;
 using OpenQA.Selenium.Support.UI;
+using Renci.SshNet;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -31,13 +33,17 @@ namespace HtmlTestValidator.Models
             Presenced = Directory.GetFiles(path).Length + Directory.GetDirectories(path).Length > 0;
 
             headLessChromeOption = new ChromeOptions();
-            headLessChromeOption.AddArguments("headless");
+            //headLessChromeOption.BinaryLocation = @"C:\Program Files\Google\Chrome Beta\Application\chrome.exe";
+            //headLessChromeOption.AddArguments("headless");
             //headLessChromeOption.AddArguments("--window-size=1017,973");
         }
 
         public void Evaluate(Project.Project project)
         {
-            using (var driver = new ChromeDriver(headLessChromeOption))
+            this.CopyFilesToWebServer();
+
+            //using (var driver = new ChromeDriver(headLessChromeOption))
+            using (var driver = new RemoteWebDriver(new Uri("https://selenium-grid.jedlik.cloud/wd/hub"), headLessChromeOption.ToCapabilities()))
             {
                 driver.Manage().Window.Size = new System.Drawing.Size(1017, 973);
                 var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
@@ -59,7 +65,7 @@ namespace HtmlTestValidator.Models
                     {
                         try
                         {
-                            driver.Navigate().GoToUrl($"file:///{this.path}/{condition.URL}");                            
+                            driver.Navigate().GoToUrl($"https://selenium-test.jedlik.cloud/{condition.URL}");
                             if (condition.Assertion is AssertionCount)
                                 passes += condition.Assertion.Assert(condition.Element.FindElements(driver)) ? 1 : 0;
                             else if (condition.Assertion is AssertionHtmlValidation)
@@ -81,6 +87,51 @@ namespace HtmlTestValidator.Models
                         this.StepPoints[index] = passes >= project.Steps[index].ConditionsNumberHaveToPass ? project.Steps[index].Points : 0;
                     }
                 }
+            }
+        }
+
+        private void CopyFilesToWebServer()
+        {
+            using (var client = new SftpClient("selenium-grid.jedlik.cloud", 30022, "tester", "N@gyonT1tk0s"))
+            {
+                client.Connect();
+                emptyDir(client, "");
+                uploadDir(client, "");
+            }
+        }
+
+        private void emptyDir(SftpClient client, string subDirName)
+        {
+            client.ChangeDirectory($"/files/{subDirName}");
+            foreach (var f in client.ListDirectory("./").Where(n => !n.FullName.EndsWith("/..") && !n.FullName.EndsWith("/.")))
+                if (f.IsDirectory)
+                {
+                    emptyDir(client, $"{subDirName}{f.Name}/");
+                    client.DeleteDirectory(f.FullName);
+                }
+
+            client.ChangeDirectory($"/files/{subDirName}");
+            foreach (var f in client.ListDirectory("./").Where(n => !n.FullName.EndsWith("/..") && !n.FullName.EndsWith("/.")))
+                if (f.IsRegularFile)
+                {
+                    client.DeleteFile(f.FullName);
+                }
+        }
+
+        private void uploadDir(SftpClient client, string subDirName)
+        {
+            client.ChangeDirectory($"/files/{subDirName}");
+            foreach (var file in Directory.GetFiles(Path.Combine(this.path, subDirName)))
+                using (var fileStream = new FileStream(file, FileMode.Open))
+                {
+                    client.UploadFile(fileStream, Path.GetFileName(file));
+                }
+
+            client.ChangeDirectory($"/files/{subDirName}");
+            foreach (var dir in Directory.GetDirectories(Path.Combine(this.path, subDirName)))
+            {
+                client.CreateDirectory(Path.GetFileName(dir));
+                uploadDir(client, $"{subDirName}{Path.GetFileName(dir)}/");
             }
         }
     }

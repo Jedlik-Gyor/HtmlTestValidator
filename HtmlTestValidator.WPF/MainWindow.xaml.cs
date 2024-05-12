@@ -29,7 +29,7 @@ namespace HtmlTestValidator
         {
             var openFileDialog = new Microsoft.Win32.OpenFileDialog();
             if (openFileDialog.ShowDialog() == true)
-                txtTaskJsonPath.Text = File.ReadAllText(openFileDialog.FileName);
+                txtTaskJsonPath.Text = openFileDialog.FileName;
         }
 
         private void btnSelectTestsParentFolder_Click(object sender, RoutedEventArgs e)
@@ -67,7 +67,7 @@ namespace HtmlTestValidator
                                        .ToList();
 
             Parallel.ForEach(evaluations,
-                             new ParallelOptions { MaxDegreeOfParallelism = 5 },
+                             new ParallelOptions { MaxDegreeOfParallelism = 1 },
                              evaluation => evaluation.Evaluate(project));
 
             evaluationSheet = new EvaluationSheet(project, evaluations);

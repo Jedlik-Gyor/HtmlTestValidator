@@ -13,6 +13,7 @@ namespace HtmlTestValidator
     {
         static void Main(string[] args)
         {
+            args = new string[] { "h:\\100 Tanárok\\Bognár Pál\\2023-2024\\10A Programozás\\Dolgozat 2024-04-29\\Kiértékelő prg\\The_Game_Awards_2021.json", "d:\\BP\\10A_2024-04-29" };
             if (args.Length >= 2) {
                 var taskJsonPath = args[0];
                 var testParentFolderPath = args[1];
@@ -43,7 +44,7 @@ namespace HtmlTestValidator
                                         .ToList();
 
                 Parallel.ForEach(evaluations,
-                                new ParallelOptions { MaxDegreeOfParallelism = 5 },
+                                new ParallelOptions { MaxDegreeOfParallelism = 1 },
                                 evaluation => evaluation.Evaluate(project));
 
                 evaluationSheet = new EvaluationSheet(project, evaluations);
