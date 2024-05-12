@@ -20,6 +20,7 @@ namespace HtmlTestValidator.Models
         public string[] StepErrors { get; private set; }
         public bool Presenced { get; private set; }
 
+        public event EventHandler<string> LogEvent;
 
         private ChromeOptions headLessChromeOption;
         private string path;
@@ -40,6 +41,7 @@ namespace HtmlTestValidator.Models
 
         public void Evaluate(Project.Project project)
         {
+            Log($"Dolgozat: {Path.GetFileName(this.path)}");
             this.CopyFilesToWebServer();
 
             //using (var driver = new ChromeDriver(headLessChromeOption))
@@ -60,6 +62,7 @@ namespace HtmlTestValidator.Models
 
                 foreach (var (step, index) in project.Steps.Select((value, i) => (value, i)))
                 {
+                    Log($"\tEllenőrzés: {step.Description}");
                     var passes = 0;
                     foreach (var condition in step.Conditions)
                     {
@@ -102,6 +105,7 @@ namespace HtmlTestValidator.Models
 
         private void emptyDir(SftpClient client, string subDirName)
         {
+            Log($"\tTávoli könyvtár törlése: {subDirName}");
             client.ChangeDirectory($"/files/{subDirName}");
             foreach (var f in client.ListDirectory("./").Where(n => !n.FullName.EndsWith("/..") && !n.FullName.EndsWith("/.")))
                 if (f.IsDirectory)
@@ -120,19 +124,27 @@ namespace HtmlTestValidator.Models
 
         private void uploadDir(SftpClient client, string subDirName)
         {
+            Log($"\tFájlok feltöltése: {subDirName}");
             client.ChangeDirectory($"/files/{subDirName}");
             foreach (var file in Directory.GetFiles(Path.Combine(this.path, subDirName)))
-                using (var fileStream = new FileStream(file, FileMode.Open))
-                {
-                    client.UploadFile(fileStream, Path.GetFileName(file));
-                }
+                if (Path.GetExtension(file) != ".mkv" && Path.GetExtension(file) != ".avi")
+                    using (var fileStream = new FileStream(file, FileMode.Open))
+                    {
+                        client.UploadFile(fileStream, Path.GetFileName(file));
+                    }
 
-            client.ChangeDirectory($"/files/{subDirName}");
             foreach (var dir in Directory.GetDirectories(Path.Combine(this.path, subDirName)))
             {
+                client.ChangeDirectory($"/files/{subDirName}");
                 client.CreateDirectory(Path.GetFileName(dir));
                 uploadDir(client, $"{subDirName}{Path.GetFileName(dir)}/");
             }
+        }
+
+        private void Log(string message)
+        {
+            if (LogEvent is not null)
+                LogEvent.Invoke(this, message);
         }
     }
 }

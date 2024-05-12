@@ -66,9 +66,15 @@ namespace HtmlTestValidator
                                        .Select(d => new Evaluation(d, project.Steps.Length))
                                        .ToList();
 
-            Parallel.ForEach(evaluations,
-                             new ParallelOptions { MaxDegreeOfParallelism = 1 },
-                             evaluation => evaluation.Evaluate(project));
+            File.WriteAllText("feldolgozás.log", "");
+            foreach (var evaluation in evaluations)
+            {
+                evaluation.LogEvent += (sender, message) =>
+                {
+                    File.AppendAllLines("feldolgozás.log", new string[] { message });
+                };
+                evaluation.Evaluate(project);
+            }
 
             evaluationSheet = new EvaluationSheet(project, evaluations);
             evaluationSheet.SaveAs("teszt.xlsx");
