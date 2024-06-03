@@ -2,7 +2,7 @@
   "profiles": {
     "HtmlTestValidator": {
       "commandName": "Project",
-      "commandLineArgs": "c:\\Work\\Jedlik\\@@\\AgazatiKESZ\\The_Game_Awards_2021.json  c:\\Work\\Jedlik\\@@\\AgazatiKESZ\\Megoldas\\"
+      "commandLineArgs": "\"H:\\100 Tanárok\\Bognár Pál\\Fejlesztések\\Selenium\\Madame Tussauds.json\"  \"z:\\Temp\\@Ágazati vizsga feladat - web\\ \" "
     }
   }
 }
