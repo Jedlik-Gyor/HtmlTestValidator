@@ -69,8 +69,16 @@ namespace HtmlTestValidator.Models
                         try
                         {
                             driver.Navigate().GoToUrl($"https://selenium-test.jedlik.cloud/{condition.URL}");
+
+                            try
+                            {
+                                var elementPath = condition.Element is ElementByXPath ? ((ElementByXPath)condition.Element).XPath : ((ElementByCssSelector)condition.Element).CssSelector;
+                                Log($"\t\tVizsgált elem: {elementPath}");
+                            }
+                            catch { }
+
                             if (condition.Assertion is AssertionCount)
-                                passes += condition.Assertion.Assert(condition.Element.FindElements(driver)) ? 1 : 0;
+                                passes += condition.Assertion.Assert(condition.Element.FindElements(driver), Log) ? 1 : 0;
                             else if (condition.Assertion is AssertionHtmlValidation)
                                 passes += ((AssertionHtmlValidation)(condition.Assertion)).Assert($"{this.path}/{condition.URL}") ? 1 : 0;
                             else if (condition.Assertion is AssertionCssValidation)
@@ -80,8 +88,9 @@ namespace HtmlTestValidator.Models
                                 var element = condition.Element.FindElement(driver);
                                 foreach (var action in condition.Element.ActionsBefore)
                                     action.DoIt(driver, element);
-                                passes += condition.Assertion.Assert(element) ? 1 : 0;
+                                passes += condition.Assertion.Assert(element, Log) ? 1 : 0;
                             }
+                            Log($"\t\t\tEredmény: {passes} / {project.Steps[index].ConditionsNumberHaveToPass}");
                         }
                         catch (Exception ex)
                         {
@@ -141,10 +150,12 @@ namespace HtmlTestValidator.Models
             }
         }
 
-        private void Log(string message)
+        public void Log(string message)
         {
             if (LogEvent is not null)
+            {
                 LogEvent.Invoke(this, message);
+            }
         }
     }
 }

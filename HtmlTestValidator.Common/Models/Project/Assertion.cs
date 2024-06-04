@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using DocumentFormat.OpenXml.Drawing;
+using DocumentFormat.OpenXml.Wordprocessing;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 using OpenQA.Selenium;
@@ -7,6 +9,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Net.Http;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -16,8 +19,19 @@ namespace HtmlTestValidator.Models.Project
     [JsonConverter(typeof(AssertionConverter))]
     public abstract class Assertion
     {
-        public abstract bool Assert(IWebElement webElement);
-        public abstract bool Assert(ReadOnlyCollection<IWebElement> webElement);
+        public bool Assert(IWebElement webElement)
+        {
+            return Assert(webElement, null);
+        }
+
+        public abstract bool Assert(IWebElement webElement, Action<string> logger);
+
+        public bool Assert(ReadOnlyCollection<IWebElement> webElements)
+        {
+            return Assert(webElements, null);
+        }
+
+        public abstract bool Assert(ReadOnlyCollection<IWebElement> webElements, Action<string> logger);
     }
 
     public class AssertionEquals: Assertion
@@ -27,13 +41,19 @@ namespace HtmlTestValidator.Models.Project
         [JsonProperty("actual")]
         public AssertActual Actual { get; set; }
 
-        public override bool Assert(IWebElement webElement)
+        public override bool Assert(IWebElement webElement, Action<string> logger)
         {
-            var value = Actual.GetValue(webElement).ToLower();
-            return Expected.ToLower().CompareTo(value) == 0;
+            var value = Actual.GetValue(webElement);
+            if (logger != null)
+            {
+                logger($"\t\t\tEgyenlőség vizsgálat");
+                logger($"\t\t\t\tElvárt érték: {Expected}");
+                logger($"\t\t\t\tAktuális érték: {value}");
+            }
+            return Expected.ToLower().CompareTo(value.ToLower()) == 0;
         }
 
-        public override bool Assert(ReadOnlyCollection<IWebElement> webElement)
+        public override bool Assert(ReadOnlyCollection<IWebElement> webElement, Action<string> logger)
         {
             return false;
         }
@@ -47,17 +67,23 @@ namespace HtmlTestValidator.Models.Project
         [JsonProperty("greaterThen")]
         public string GreaterThen { get; set; }
 
-        public override bool Assert(IWebElement webElement)
+        public override bool Assert(IWebElement webElement, Action<string> logger)
         {
             return Expected.Trim() == "1";
         }
 
-        public override bool Assert(ReadOnlyCollection<IWebElement> webElement)
+        public override bool Assert(ReadOnlyCollection<IWebElement> webElement, Action<string> logger)
         {
+            if (logger != null)
+            {
+                logger($"\t\t\tElemszám vizsgálat");
+                logger($"\t\t\t\tElvárt érték: {Expected} / Nagyobb mint: {GreaterThen}");
+                logger($"\t\t\t\tAktuális érték: {webElement.Count()}");
+            }
             if (!string.IsNullOrEmpty(Expected))
                 return Expected.Trim() == webElement.Count().ToString();
             if (!string.IsNullOrEmpty(GreaterThen))
-                try 
+                try
                 {
                     return int.Parse(GreaterThen) < webElement.Count();
                 }
@@ -67,6 +93,7 @@ namespace HtmlTestValidator.Models.Project
                 }
             return false;
         }
+
     }
 
     public class AssertionEmpty : Assertion
@@ -74,16 +101,28 @@ namespace HtmlTestValidator.Models.Project
         [JsonProperty("actual")]
         public AssertActual Actual { get; set; }
 
-        public override bool Assert(IWebElement webElement)
+        public override bool Assert(IWebElement webElement, Action<string> logger)
         {
-            return string.IsNullOrEmpty(Actual.GetValue(webElement));
-        }
+            var empty = string.IsNullOrEmpty(Actual.GetValue(webElement));
+            if (logger != null)
+                logger($"\t\t\tÜres-e vizsgálat: {empty}");
+            return empty;
 
-        public override bool Assert(ReadOnlyCollection<IWebElement> webElements)
+        }
+        
+        public override bool Assert(ReadOnlyCollection<IWebElement> webElements, Action<string> logger)
         {
             foreach (var webElement in webElements)
+            {
                 if (!string.IsNullOrEmpty(Actual.GetValue(webElement)))
+                {
+                    if (logger != null)
+                        logger($"\t\t\tÜres-e vizsgálat: false"); 
                     return false;
+                }
+            }
+            if (logger != null)
+                logger($"\t\t\tÜres-e vizsgálat: true");
             return true;
         }
     }
@@ -96,16 +135,29 @@ namespace HtmlTestValidator.Models.Project
         [JsonProperty("values")]
         public string[] Values { get; set; }
 
-        public override bool Assert(IWebElement webElement)
+        public override bool Assert(IWebElement webElement, Action<string> logger)
         {
+            if (logger != null)
+                logger($"\t\t\tLista elemek ellenőrzése");
             var actualValue = Actual.GetValue(webElement);
+            if (logger != null)
+                logger($"\t\t\t\tElem értéke: {actualValue}");
             foreach (var value in Values)
-                if (!actualValue.Contains(value))
+            {
+                if (!actualValue.ToLower().Contains(value.ToLower()))
+                {
+                    if (logger != null)
+                        logger($"\t\t\t\t\tEllenőrzött érték: {value} - NEM tartalmazza");
                     return false;
+                }
+                else
+                    if (logger != null)
+                        logger($"\t\t\t\t\tEllenőrzött érték: {value} - OK");
+            }
             return true;
         }
 
-        public override bool Assert(ReadOnlyCollection<IWebElement> webElement)
+        public override bool Assert(ReadOnlyCollection<IWebElement> webElements, Action<string> logger)
         {
             return false;
         }
@@ -119,13 +171,26 @@ namespace HtmlTestValidator.Models.Project
         [JsonProperty("pattern")]
         public string Pattern { get; set; }
 
-        public override bool Assert(IWebElement webElement)
+        public override bool Assert(IWebElement webElement, Action<string> logger)
         {
             var actualValue = Actual.GetValue(webElement);
-            return Regex.Match(actualValue, Pattern, RegexOptions.IgnoreCase).Success;
+            if (logger != null)
+            {
+                logger($"\t\t\tRegex ellenőrzés");
+                logger($"\t\t\t\tVizsgált érték: {actualValue}");
+            }
+            var success = Regex.Match(actualValue, Pattern, RegexOptions.IgnoreCase).Success;
+            if (logger != null)
+            {
+                if (success)
+                    logger($"\t\t\t\tMinta: {Pattern} - OK");
+                else
+                    logger($"\t\t\t\tMinta: {Pattern} - HIBA");
+            }
+            return success;
         }
 
-        public override bool Assert(ReadOnlyCollection<IWebElement> webElement)
+        public override bool Assert(ReadOnlyCollection<IWebElement> webElements, Action<string> logger)
         {
             return false;
         }
@@ -138,8 +203,6 @@ namespace HtmlTestValidator.Models.Project
 
         public bool Assert(string path)
         {
-
-
             using (var client = new HttpClient())
             {
                 client.DefaultRequestHeaders.Add("User-Agent", "C# App");
@@ -154,12 +217,13 @@ namespace HtmlTestValidator.Models.Project
                 return taskResponse.Result.Contains("\"messages\":[]");
             }
         }
-        public override bool Assert(IWebElement webElement)
+
+        public override bool Assert(IWebElement webElement, Action<string> logger)
         {
             throw new NotImplementedException();
         }
 
-        public override bool Assert(ReadOnlyCollection<IWebElement> webElement)
+        public override bool Assert(ReadOnlyCollection<IWebElement> webElements, Action<string> logger)
         {
             throw new NotImplementedException();
         }
@@ -191,17 +255,16 @@ namespace HtmlTestValidator.Models.Project
                 return taskResponse.Result.Contains("Congratulations! No Error Found.");
             }
         }
-        public override bool Assert(IWebElement webElement)
+
+        public override bool Assert(IWebElement webElement, Action<string> logger)
         {
             throw new NotImplementedException();
         }
 
-        public override bool Assert(ReadOnlyCollection<IWebElement> webElement)
+        public override bool Assert(ReadOnlyCollection<IWebElement> webElements, Action<string> logger)
         {
             throw new NotImplementedException();
         }
-
-
     }
 
     public class AssertionClassConverter : DefaultContractResolver
