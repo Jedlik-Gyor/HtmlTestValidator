@@ -1,4 +1,6 @@
-﻿using HtmlTestValidator.Models.Project;
+﻿using Docker.DotNet;
+using Docker.DotNet.Models;
+using HtmlTestValidator.Models.Project;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Remote;
@@ -13,20 +15,22 @@ using System.Threading.Tasks;
 
 namespace HtmlTestValidator.Models
 {
-    public class Evaluation
+    public class Evaluation: IDisposable
     {
         public string Name { get; private set; }
         public double[] StepPoints { get; private set; }
         public string[] StepErrors { get; private set; }
         public bool Presenced { get; private set; }
         private readonly string hubURL;
+        private DockerClient dockerClient;
+        private int evaluationIndex;
 
         public event EventHandler<string> LogEvent;
 
         private ChromeOptions headLessChromeOption;
         private string path;
 
-        public Evaluation(string path, int numberOfSteps, string hubURL = "https://selenium-grid.jedlik.cloud/wd/hub")
+        public Evaluation(string path, int numberOfSteps, string hubURL = "https://selenium-grid.jedlik.cloud/wd/hub", int index = 0)
         {
             this.path = path.Replace('\\', '/').Replace("#", "%23");
             this.Name = Path.GetFileName(path);
@@ -36,11 +40,19 @@ namespace HtmlTestValidator.Models
 
             headLessChromeOption = new ChromeOptions();
             this.hubURL = hubURL;
+            if (!hubURL.Contains("jedlik.cloud"))
+                dockerClient = new DockerClientConfiguration().CreateClient();
+            evaluationIndex = index;
+        }
+
+        public void Dispose()
+        {
+            dockerClient?.Dispose();
         }
 
         public void Evaluate(Project.Project project, string pageURL = null)
         {
-            Log($"Dolgozat: {Path.GetFileName(this.path)}");
+            //Log($"Dolgozat: {Path.GetFileName(this.path)}");
 
             using (var driver = new RemoteWebDriver(new Uri(hubURL), headLessChromeOption.ToCapabilities()))
             {
@@ -59,7 +71,10 @@ namespace HtmlTestValidator.Models
                     {
                         try
                         {
-                            driver.Navigate().GoToUrl($"https://selenium-test.jedlik.cloud/{condition.URL}");
+                            if (this.dockerClient == null)
+                                driver.Navigate().GoToUrl($"https://selenium-test.jedlik.cloud/{condition.URL}");
+                            else
+                                driver.Navigate().GoToUrl($"http://10.5.99.{100 + evaluationIndex}/{condition.URL}");
 
                             try
                             {
@@ -91,6 +106,15 @@ namespace HtmlTestValidator.Models
                     }
                 }
             }
+
+            if (this.dockerClient != null)
+            {
+                try
+                {
+                    dockerClient.Containers.RemoveContainerAsync($"nginx-for-selenium-{evaluationIndex}", new ContainerRemoveParameters() { Force = true});
+                }
+                catch { }
+            }
         }
 
         public void CopyFilesToWebServer()
@@ -101,6 +125,54 @@ namespace HtmlTestValidator.Models
                 emptyDir(client, "");
                 uploadDir(client, "");
             }
+        }
+
+        public async Task CreateNginxContainer()
+        {
+            await dockerClient.Containers.CreateContainerAsync(new CreateContainerParameters()
+            {
+                Image = "nginx",
+                ExposedPorts = new Dictionary<string, EmptyStruct>
+                {
+                   { "80", default(EmptyStruct) }
+                },
+                HostConfig = new HostConfig
+                {
+                    PortBindings = new Dictionary<string, IList<PortBinding>>
+                    {
+                          { "80", new List<PortBinding> { new PortBinding { HostPort = $"{8001 + evaluationIndex}" } } }
+                    },
+                    Mounts = new List<Mount>
+                    {
+                         new Mount
+                         {
+                             Source = this.path,
+                             Target = "/usr/share/nginx/html",
+                             Type = "bind"
+                         }
+                    },
+                    
+                },
+                Name = $"nginx-for-selenium-{evaluationIndex}",
+                NetworkingConfig = new NetworkingConfig
+                {
+                    EndpointsConfig = new Dictionary<string, EndpointSettings>
+                    {
+                        {
+                            "selenium-test_vpcbr",
+                            new EndpointSettings
+                            {
+                                IPAMConfig = new EndpointIPAMConfig
+                                {
+                                    IPv4Address = $"10.5.99.{100 + evaluationIndex}"
+                                }
+                            }
+                        }
+                    },
+                }
+            });
+            Thread.Sleep(500);
+            await dockerClient.Containers.StartContainerAsync($"nginx-for-selenium-{evaluationIndex}", new ContainerStartParameters());
         }
 
         private void emptyDir(SftpClient client, string subDirName)

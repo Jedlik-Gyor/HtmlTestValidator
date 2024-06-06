@@ -39,7 +39,7 @@ namespace HtmlTestValidator
                     txtTestParentFolder.Text = dialog.SelectedPath;
         }
 
-        private void btnStart_Click(object sender, RoutedEventArgs e)
+        private async void btnStart_Click(object sender, RoutedEventArgs e)
         {
             messageBar.Clear();
             if (!File.Exists(txtTaskJsonPath.Text))
@@ -63,19 +63,32 @@ namespace HtmlTestValidator
                 return;
             }
             var evaluations = Directory.GetDirectories(txtTestParentFolder.Text)
-                                       .Select(d => new Evaluation(d, project.Steps.Length, "http://localhost:4444/wd/hub"))
+                                       .Select((d, i) => new Evaluation(d, project.Steps.Length, (rbLocalDocker.IsChecked == true ? "http://localhost:4444/wd/hub" : "https://selenium-grid.jedlik.cloud/wd/hub"), i))
                                        .ToList();
 
             File.WriteAllText("feldolgozás.log", "");
-            foreach (var evaluation in evaluations)
+
+
+            object lockObject = new object();
+            var docker = rbLocalDocker.IsChecked == true;
+            //foreach (var evaluation in evaluations)
+            var options = new ParallelOptions { MaxDegreeOfParallelism = docker ? 5 : 1 };
+            await Parallel.ForEachAsync(evaluations, options, async (evaluation, token) =>
             {
+                File.WriteAllText($"feldolgozás - {evaluation.Name}.log", "");
                 evaluation.LogEvent += (sender, message) =>
                 {
-                    File.AppendAllLines("feldolgozás.log", new string[] { message });
-                };                
-                evaluation.CopyFilesToWebServer();
+                    lock(lockObject)
+                        File.AppendAllLines("feldolgozás.log", new string[] { message });
+                    File.AppendAllLines($"feldolgozás - {evaluation.Name}.log", new string[] { message });
+                };
+                evaluation.Log($"Dolgozat: {evaluation.Name}");
+                if (docker)
+                    await evaluation.CreateNginxContainer();
+                else
+                    evaluation.CopyFilesToWebServer();
                 evaluation.Evaluate(project);
-            }
+            });
 
             evaluationSheet = new EvaluationSheet(project, evaluations);
             evaluationSheet.SaveAs("teszt.xlsx");

@@ -1,4 +1,4 @@
-# To execute this docker compose yml file use `docker compose -f docker-compose-v3.yml up --scale chrome=4`
+# To execute this docker compose yml file use `docker compose -f docker-compose-v3.yml -p selenium-test up --scale chrome=5`
 # Add the `-d` flag at the end for detached execution
 # To stop the execution, hit Ctrl+C, and then `docker compose -f docker-compose-v3.yml down`
 version: "3"
@@ -12,6 +12,8 @@ services:
       - SE_EVENT_BUS_HOST=selenium-hub
       - SE_EVENT_BUS_PUBLISH_PORT=4442
       - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+    networks:
+      - vpcbr
 
   selenium-hub:
     image: selenium/hub:4.21.0-20240522
@@ -20,3 +22,14 @@ services:
       - "4442:4442"
       - "4443:4443"
       - "4444:4444"
+    networks:
+      vpcbr:
+        ipv4_address: 10.5.0.6
+
+networks:
+  vpcbr:
+    driver: bridge
+    ipam:
+     config:
+       - subnet: 10.5.0.0/16
+         gateway: 10.5.0.1
