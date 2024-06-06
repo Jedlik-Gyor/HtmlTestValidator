@@ -19,13 +19,14 @@ namespace HtmlTestValidator.Models
         public double[] StepPoints { get; private set; }
         public string[] StepErrors { get; private set; }
         public bool Presenced { get; private set; }
+        private readonly string hubURL;
 
         public event EventHandler<string> LogEvent;
 
         private ChromeOptions headLessChromeOption;
         private string path;
 
-        public Evaluation(string path, int numberOfSteps)
+        public Evaluation(string path, int numberOfSteps, string hubURL = "https://selenium-grid.jedlik.cloud/wd/hub")
         {
             this.path = path.Replace('\\', '/').Replace("#", "%23");
             this.Name = Path.GetFileName(path);
@@ -34,27 +35,17 @@ namespace HtmlTestValidator.Models
             Presenced = Directory.GetFiles(path).Length + Directory.GetDirectories(path).Length > 0;
 
             headLessChromeOption = new ChromeOptions();
-            //headLessChromeOption.BinaryLocation = @"C:\Program Files\Google\Chrome Beta\Application\chrome.exe";
-            //headLessChromeOption.AddArguments("headless");
-            //headLessChromeOption.AddArguments("--window-size=1017,973");
+            this.hubURL = hubURL;
         }
 
-        public void Evaluate(Project.Project project)
+        public void Evaluate(Project.Project project, string pageURL = null)
         {
             Log($"Dolgozat: {Path.GetFileName(this.path)}");
-            this.CopyFilesToWebServer();
 
-            //using (var driver = new ChromeDriver(headLessChromeOption))
-            using (var driver = new RemoteWebDriver(new Uri("https://selenium-grid.jedlik.cloud/wd/hub"), headLessChromeOption.ToCapabilities()))
+            using (var driver = new RemoteWebDriver(new Uri(hubURL), headLessChromeOption.ToCapabilities()))
             {
                 driver.Manage().Window.Size = new System.Drawing.Size(1017, 973);
                 var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
-
-                //driver.Navigate().GoToUrl($"file:///{this.path}/haz01.html");
-                //var xx = driver.FindElement(By.XPath("//body"));
-                //System.Windows.MessageBox.Show(xx.GetCssValue("width"));
-
-                //element = driver.FindElement(By.XPath("//head/link[@rel='stylesheet'][2][contains(@href, 'style.css')]"));
 
                 if (project.BeforeOperations != null)
                     foreach (var beforeOperation in project.BeforeOperations)
@@ -102,7 +93,7 @@ namespace HtmlTestValidator.Models
             }
         }
 
-        private void CopyFilesToWebServer()
+        public void CopyFilesToWebServer()
         {
             using (var client = new SftpClient("selenium-grid.jedlik.cloud", 30022, "tester", "N@gyonT1tk0s"))
             {

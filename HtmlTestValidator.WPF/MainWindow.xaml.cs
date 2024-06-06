@@ -63,7 +63,7 @@ namespace HtmlTestValidator
                 return;
             }
             var evaluations = Directory.GetDirectories(txtTestParentFolder.Text)
-                                       .Select(d => new Evaluation(d, project.Steps.Length))
+                                       .Select(d => new Evaluation(d, project.Steps.Length, "http://localhost:4444/wd/hub"))
                                        .ToList();
 
             File.WriteAllText("feldolgozás.log", "");
@@ -72,7 +72,8 @@ namespace HtmlTestValidator
                 evaluation.LogEvent += (sender, message) =>
                 {
                     File.AppendAllLines("feldolgozás.log", new string[] { message });
-                };
+                };                
+                evaluation.CopyFilesToWebServer();
                 evaluation.Evaluate(project);
             }
 
