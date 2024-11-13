@@ -29,6 +29,7 @@ services:
 networks:
   vpcbr:
     driver: bridge
+    name: selenium-test_vpcbr 
     ipam:
      config:
        - subnet: 10.5.0.0/16
