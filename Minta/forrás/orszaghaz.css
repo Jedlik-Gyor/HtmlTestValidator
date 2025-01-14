@@ -1,0 +1,68 @@
+body {
+    font-size: 13pt;
+}
+
+h1 {
+    clear:both;
+    font-weight: normal;
+}
+
+h2 {
+    clear:both;
+    margin-bottom:0;
+}
+
+#header {
+    background: url('flag.png') no-repeat 50% -9px;
+    height: 200px;
+    max-width: 1170px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#header-logo {
+    float:left;
+}
+
+#cimer {
+    padding-top: 20px;
+    height: 150px;    
+}
+
+#header-cimer {
+    margin-left :auto;
+    margin-right :auto;
+    width: 90px;
+}
+
+#content {
+    background-color: white;
+    box-shadow: 2px 2px silver;
+    padding: 10px;
+    max-width: 1170px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#content img {
+    height: 200px;
+    margin: 10px;
+    float: left;
+}
+
+#content .description {
+    overflow: hidden;
+    padding: 10px;
+    margin-right: 10px;
+}
+
+#footer {
+    box-shadow: 2px 2px silver;
+    padding: 10px;
+    background-color: white;
+    text-align: right;
+    margin-top: 20px;
+    max-width: 1170px;
+    margin-left: auto;
+    margin-right: auto;
+}

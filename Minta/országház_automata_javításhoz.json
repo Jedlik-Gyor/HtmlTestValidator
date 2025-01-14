@@ -1,0 +1,951 @@
+{
+	"name": "HTML feladat - Országház",
+	"teacher": "Bognár Pál",
+	"class": "09A",
+	"date": "2022.11.21",
+	"steps": [
+		{
+			"id": "1",
+			"description": "Oldal létezik, nyelve magyarm kódolása UTF-8",
+			"points": 1,
+			"conditionsNumberHaveToPass": "2",
+			"conditions": [
+				{
+					"url": "orszaghaz.html",
+					"element": {
+						"byXPath": "//html"
+					},
+					"assert": {
+						"operation": "equals",
+						"expected": "hu",
+						"actual": {
+							"attribute": "lang"
+						}
+					}
+				},
+				{
+					"url": "orszaghaz.html",
+					"element": {
+						"byXPath": "//head/meta[@charset]"
+					},
+					"assert": {
+						"operation": "equals",
+						"expected": "utf-8",
+						"actual": {
+							"attribute": "charset"
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "2",
+			"description": "A címsor \"Az Országház leírása\" ",
+			"points": 1,
+			"conditionsNumberHaveToPass": "1",
+			"conditions": [
+				{
+					"url": "orszaghaz.html",
+					"element": {
+						"byXPath": "//head/title"
+					},
+					"assert": {
+						"operation": "equals",
+						"expected": "Az Országház leírása",
+						"actual": {
+							"attribute": "innerHTML"
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "4",
+			"description": "A weboldal betű- és háttérszíne helyes",
+			"points": 1,
+			"conditionsNumberHaveToPass": "3",
+			"conditions": [
+				{
+					"url": "orszaghaz.html",
+					"element": {
+						"byXPath": "//body"
+					},
+					"assert": {
+						"operation": "isempty",
+						"actual": {
+							"attribute": "style"
+						}
+					}
+				},
+				{
+					"url": "orszaghaz.html",
+					"element": {
+						"byXPath": "//body"
+					},
+					"assert": {
+						"operation": "equals",
+						"expected": "rgba(249, 245, 236, 1)",
+						"actual": {
+							"cssValue": "background-color"
+						}
+					}
+				},
+				{
+					"url": "orszaghaz.html",
+					"element": {
+						"byXPath": "//body"
+					},
+					"assert": {
+						"operation": "equals",
+						"expected": "rgba(115, 86, 55, 1)",
+						"actual": {
+							"cssValue": "color"
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "5/a",
+			"description": "Létezik a header azonosítójú div",
+			"points": 1,
+			"conditionsNumberHaveToPass": "1",			
+			"conditions": [
+				{
+					"url": "orszaghaz.html",
+					"element": {
+						"byXPath": "//div[@id='header']"
+					},
+					"assert": {
+						"operation": "count",
+						"expected": "1"
+					}
+				}
+			]
+		},
+		{
+			"id": "5/b",
+			"description": "logo.png a megfelelő helyen létezik",
+			"points": 1,
+			"conditionsNumberHaveToPass": "2",			
+			"conditions": [
+				{
+					"url": "orszaghaz.html",
+					"element": {
+						"byXPath": "//div[@id='header']/img[@id='header-logo']"
+					},
+					"assert": {
+						"operation": "count",
+						"expected": "1"
+					}
+				},
+				{
+					"url": "orszaghaz.html",
+					"element": {
+						"byXPath": "//div[@id='header']/img[@id='header-logo']"
+					},
+					"assert": {
+						"operation": "contains",
+						"actual": {
+							"attribute": "src"
+						},
+						"values": [
+							"logo.png"
+						]
+					}
+				}
+			]
+		},
+		{
+			"id": "5/c",
+			"description": "header-cimer azonosítójú div",
+			"points": 1,
+			"conditionsNumberHaveToPass": "1",			
+			"conditions": [
+				{
+					"url": "orszaghaz.html",
+					"element": {
+						"byXPath": "//div[@id='header']/div[@id='header-cimer']"
+					},
+					"assert": {
+						"operation": "count",
+						"expected": "1"
+					}
+				}
+			]
+		},
+		{
+			"id": "5/d",
+			"description": "cimer.png beszúrása",
+			"points": 1,
+			"conditionsNumberHaveToPass": "2",			
+			"conditions": [
+				{
+					"url": "orszaghaz.html",
+					"element": {
+						"byXPath": "//div[@id='header']/div[@id='header-cimer']/img[@id='cimer']"
+					},
+					"assert": {
+						"operation": "count",
+						"expected": "1"
+					}
+				},
+				{
+					"url": "orszaghaz.html",
+					"element": {
+						"byXPath": "//div[@id='header']/div[@id='header-cimer']/img[@id='cimer']"
+					},
+					"assert": {
+						"operation": "contains",
+						"actual": {
+							"attribute": "src"
+						},
+						"values": [
+							"cimer.png"
+						]
+					}
+				}
+
+			]
+		},
+		{
+			"id": "6",
+			"description": "Létezik a content azonosítójú div",
+			"points": 1,
+			"conditionsNumberHaveToPass": "1",			
+			"conditions": [
+				{
+					"url": "orszaghaz.html",
+					"element": {
+						"byXPath": "//div[@id='content']"
+					},
+					"assert": {
+						"operation": "count",
+						"expected": "1"
+					}
+				}
+			]
+		},
+		{
+			"id": "7",
+			"description": "h1, h2 kialakítása",
+			"points": 1,
+			"conditionsNumberHaveToPass": "4",			
+			"conditions": [
+				{
+					"url": "orszaghaz.html",
+					"element": {
+						"byXPath": "//div[@id='content']/h1"
+					},
+					"assert": {
+						"operation": "equals",
+						"expected": "Az Ország Háza",
+						"actual": {
+							"text": ""
+						}
+					}
+				},
+				{
+					"url": "orszaghaz.html",
+					"element": {
+						"byXPath": "//div[@id='content']/h2[1]"
+					},
+					"assert": {
+						"operation": "equals",
+						"expected": "Az Országház építése",
+						"actual": {
+							"text": ""
+						}
+					}
+				},
+				{
+					"url": "orszaghaz.html",
+					"element": {
+						"byXPath": "//div[@id='content']/h2[2]"
+					},
+					"assert": {
+						"operation": "equals",
+						"expected": "Az épület külső megjelenése és stílusa",
+						"actual": {
+							"text": ""
+						}
+					}
+				},
+				{
+					"url": "orszaghaz.html",
+					"element": {
+						"byXPath": "//div[@id='content']/h2[3]"
+					},
+					"assert": {
+						"operation": "equals",
+						"expected": "Fűtés és légkondicionálás",
+						"actual": {
+							"text": ""
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "8/a",
+			"description": "h1 betűmérete 24 pontos",
+			"points": 1,
+			"conditionsNumberHaveToPass": "2",
+			"conditions": [
+				{
+					"url": "orszaghaz.html",
+					"element": {
+						"byXPath": "//h1[1]"
+					},
+					"assert": {
+						"operation": "isempty",
+						"actual": {
+							"attribute": "style"
+						}
+					}
+				},				
+				{
+					"url": "orszaghaz.html",
+					"element": {
+						"byXPath": "//h1[1]"
+					},
+					"assert": {
+						"operation": "equals",
+						"expected": "32px",
+						"actual": {
+							"cssValue": "font-size"
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "8/b",
+			"description": "h2 betűmérete 16 pontos",
+			"points": 1,
+			"conditionsNumberHaveToPass": "2",
+			"conditions": [
+				{
+					"url": "orszaghaz.html",
+					"element": {
+						"byXPath": "//h2[1]"
+					},
+					"assert": {
+						"operation": "isempty",
+						"actual": {
+							"attribute": "style"
+						}
+					}
+				},				
+				{
+					"url": "orszaghaz.html",
+					"element": {
+						"byXPath": "//h2[1]"
+					},
+					"assert": {
+						"operation": "equals",
+						"expected": "21.3333px",
+						"actual": {
+							"cssValue": "font-size"
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "9/a",
+			"description": "Létezik a description osztályú div",
+			"points": 1,
+			"conditionsNumberHaveToPass": "1",			
+			"conditions": [
+				{
+					"url": "orszaghaz.html",
+					"element": {
+						"byXPath": "//div[@id='content']/div[1]"
+					},
+					"assert": {
+						"operation": "contains",
+						"actual": {
+							"attribute": "class"
+						},
+						"values": [
+							"description"
+						]
+					}
+				}
+			]
+		},
+		{
+			"id": "9/b",
+			"description": "Beszúrta a dunai_latkep.jpg képet",
+			"points": 1,
+			"conditionsNumberHaveToPass": "1",			
+			"conditions": [
+				{
+					"url": "orszaghaz.html",
+					"element": {
+						"byXPath": "//div[@id='content']/div[1]/img[contains(@src,'dunai_latkep.jpg')]"
+					},
+					"assert": {
+						"operation": "count",
+						"expected": "1"
+					}
+				}
+			]
+		},
+		{
+			"id": "9/c",
+			"description": "A dunai_latkep.jpg alt és title tulajdonsága helyes",
+			"points": 1,
+			"conditionsNumberHaveToPass": "2",			
+			"conditions": [
+				{
+					"url": "orszaghaz.html",
+					"element": {
+						"byXPath": "//img[contains(@src,'dunai_latkep.jpg')]"
+					},
+					"assert": {
+						"operation": "equals",
+						"expected": "Dunai látkép",
+						"actual": {
+							"attribute": "alt"
+						}
+					}
+				},
+				{
+					"url": "orszaghaz.html",
+					"element": {
+						"byXPath": "//img[contains(@src,'dunai_latkep.jpg')]"
+					},
+					"assert": {
+						"operation": "equals",
+						"expected": "Dunai látkép",
+						"actual": {
+							"attribute": "title"
+						}
+					}
+				}
+
+			]
+		},
+		{
+			"id": "9/d",
+			"description": "Magyarázó szöveghez bekezdés",
+			"points": 1,
+			"conditionsNumberHaveToPass": "1",			
+			"conditions": [
+				{
+					"url": "orszaghaz.html",
+					"element": {
+						"byXPath": "//div[@id='content']/div[1]/p[1]"
+					},
+					"assert": {
+						"operation": "contains",
+						"values": [
+							"Magyarország parlamentjének épületét"
+						],
+						"actual": {
+							"text": ""
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "9/e",
+			"description": "A 'description' osztály sorkizárt",
+			"points": 1,
+			"conditionsNumberHaveToPass": "2",			
+			"conditions": [
+				{
+					"url": "orszaghaz.html",
+					"element": {
+						"byXPath": "//div[contains(@class,'description')]"
+					},
+					"assert": {
+						"operation": "isempty",
+						"actual": {
+							"attribute": "style"
+						}
+					}
+				},
+				{
+					"url": "orszaghaz.html",
+					"element": {
+						"byXPath": "//div[contains(@class,'description')]"
+					},
+					"assert": {
+						"operation": "equals",
+						"expected": "justify",
+						"actual": {
+							"cssValue": "text-align"
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "10/a",
+			"description": "Létezik a description osztályú div",
+			"points": 1,
+			"conditionsNumberHaveToPass": "1",			
+			"conditions": [
+				{
+					"url": "orszaghaz.html",
+					"element": {
+						"byXPath": "//div[@id='content']/div[2]"
+					},
+					"assert": {
+						"operation": "contains",
+						"actual": {
+							"attribute": "class"
+						},
+						"values": [
+							"description"
+						]
+					}
+				}
+			]
+		},
+		{
+			"id": "10/b",
+			"description": "Beszúrta a epitkezes.jpg és ajtokeret.jpg képeket",
+			"points": 1,
+			"conditionsNumberHaveToPass": "2",			
+			"conditions": [
+				{
+					"url": "orszaghaz.html",
+					"element": {
+						"byXPath": "//div[@id='content']/div[2]/img[contains(@src,'epitkezes.jpg')]"
+					},
+					"assert": {
+						"operation": "count",
+						"expected": "1"
+					}
+				},
+				{
+					"url": "orszaghaz.html",
+					"element": {
+						"byXPath": "//div[@id='content']/div[2]/img[contains(@src,'ajtokeret.jpg')]"
+					},
+					"assert": {
+						"operation": "count",
+						"expected": "1"
+					}
+				}
+			]
+		},
+		{
+			"id": "10/c",
+			"description": "inline stílus az ajtokeret-hez",
+			"points": 1,
+			"conditionsNumberHaveToPass": "2",			
+			"conditions": [
+				{
+					"url": "orszaghaz.html",
+					"element": {
+						"byXPath": "//img[contains(@src,'ajtokeret.jpg')]"
+					},
+					"assert": {
+						"operation": "equals",
+						"expected": "right",
+						"actual": {
+							"cssValue": "float"
+						}
+					}
+				},
+				{
+					"url": "orszaghaz.html",
+					"element": {
+						"byXPath": "//img[contains(@src,'ajtokeret.jpg')]"
+					},
+					"assert": {
+						"operation": "contains",
+						"actual": {
+							"attribute": "style"
+						},
+						"values": [
+							"float"
+						]
+					}
+				}	
+			]
+		},
+		{
+			"id": "10/d",
+			"description": "Magyarázó szöveghez bekezdés",
+			"points": 1,
+			"conditionsNumberHaveToPass": "1",			
+			"conditions": [
+				{
+					"url": "orszaghaz.html",
+					"element": {
+						"byXPath": "//div[@id='content']/div[2]/p[1]"
+					},
+					"assert": {
+						"operation": "contains",
+						"values": [
+							"A XIX. század végén"
+						],
+						"actual": {
+							"text": ""
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "11/a",
+			"description": "Létezik a 3. és 4. description osztályú div",
+			"points": 1,
+			"conditionsNumberHaveToPass": "2",			
+			"conditions": [
+				{
+					"url": "orszaghaz.html",
+					"element": {
+						"byXPath": "//div[@id='content']/div[3]"
+					},
+					"assert": {
+						"operation": "contains",
+						"actual": {
+							"attribute": "class"
+						},
+						"values": [
+							"description"
+						]
+					}
+				},
+				{
+					"url": "orszaghaz.html",
+					"element": {
+						"byXPath": "//div[@id='content']/div[4]"
+					},
+					"assert": {
+						"operation": "contains",
+						"actual": {
+							"attribute": "class"
+						},
+						"values": [
+							"description"
+						]
+					}
+				}
+			]
+		},
+		{
+			"id": "11/b",
+			"description": "Beszúrta a kocsipke.jpg és futes.jpg képeket",
+			"points": 1,
+			"conditionsNumberHaveToPass": "2",			
+			"conditions": [
+				{
+					"url": "orszaghaz.html",
+					"element": {
+						"byXPath": "//div[@id='content']/div[3]/img[contains(@src,'kocsipke.jpg')]"
+					},
+					"assert": {
+						"operation": "count",
+						"expected": "1"
+					}
+				},
+				{
+					"url": "orszaghaz.html",
+					"element": {
+						"byXPath": "//div[@id='content']/div[4]/img[contains(@src,'futes.jpg')]"
+					},
+					"assert": {
+						"operation": "count",
+						"expected": "1"
+					}
+				}
+			]
+		},
+		{
+			"id": "11/c",
+			"description": "Magyarázó szövegekhez bekezdések",
+			"points": 1,
+			"conditionsNumberHaveToPass": "2",			
+			"conditions": [
+				{
+					"url": "orszaghaz.html",
+					"element": {
+						"byXPath": "//div[@id='content']/div[3]/p[1]"
+					},
+					"assert": {
+						"operation": "contains",
+						"values": [
+							"A Ház méretei tiszteletet parancsolóak"
+						],
+						"actual": {
+							"text": ""
+						}
+					}
+				},
+				{
+					"url": "orszaghaz.html",
+					"element": {
+						"byXPath": "//div[@id='content']/div[4]/p[1]"
+					},
+					"assert": {
+						"operation": "contains",
+						"values": [
+							"A Ház fűtési és szellőztetési"
+						],
+						"actual": {
+							"text": ""
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "12/a",
+			"description": "Létezik a div#footer",
+			"points": 1,
+			"conditionsNumberHaveToPass": "1",			
+			"conditions": [
+				{
+					"url": "orszaghaz.html",
+					"element": {
+						"byXPath": "//div[@id='content']/following-sibling::div"
+					},
+					"assert": {
+						"operation": "equals",
+						"actual": {
+							"attribute": "id"
+						},
+						"expected": "footer"
+					}
+				}
+			]
+		},
+		{
+			"id": "12/b",
+			"description": "Footer-en belüli hivatkozás",
+			"points": 1,
+			"conditionsNumberHaveToPass": "1",			
+			"conditions": [
+				{
+					"url": "orszaghaz.html",
+					"element": {
+						"byXPath": "//div[@id='footer']/a[contains(@href, 'http://latogatokozpont.parlament.hu/orszaghaz')]"
+					},
+					"assert": {
+						"operation": "count",
+						"expected": "1"
+					}
+				}
+			]
+		},
+		{
+			"id": "12/c",
+			"description": "A láblécben található hivatkozás betűszíne megfelelő.",
+			"points": 1,
+			"conditionsNumberHaveToPass": "2",
+			"conditions": [
+				{
+					"url": "orszaghaz.html",
+					"element": {
+						"byXPath": "//div[@id='footer']/a"
+					},
+					"assert": {
+						"operation": "isempty",
+						"actual": {
+							"attribute": "style"
+						}
+					}
+				},
+				{
+					"url": "orszaghaz.html",
+					"element": {
+						"byXPath": "//div[@id='footer']/a"
+					},
+					"assert": {
+						"operation": "equals",
+						"expected": "rgba(115, 86, 55, 1)",
+						"actual": {
+							"cssValue": "color"
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "13",
+			"description": "A láblécben található hivatkozás betűszíne megfelelő.",
+			"points": 1,
+			"conditionsNumberHaveToPass": "12",
+			"conditions": [
+				{
+					"url": "orszaghaz.html",
+					"element": {
+						"byXPath": "//div[@id='content']//img[1]"
+					},
+					"assert": {
+						"operation": "isempty",
+						"actual": {
+							"attribute": "style"
+						}
+					}
+				},
+				{
+					"url": "orszaghaz.html",
+					"element": {
+						"byXPath": "//div[@id='content']//img[1]"
+					},
+					"assert": {
+						"operation": "equals",
+						"expected": "rgba(115, 86, 55, 1)",
+						"actual": {
+							"cssValue": "border-left-color"
+						}
+					}
+				},
+				{
+					"url": "orszaghaz.html",
+					"element": {
+						"byXPath": "//div[@id='content']//img[1]"
+					},
+					"assert": {
+						"operation": "equals",
+						"expected": "rgba(115, 86, 55, 1)",
+						"actual": {
+							"cssValue": "border-top-color"
+						}
+					}
+				},
+				{
+					"url": "orszaghaz.html",
+					"element": {
+						"byXPath": "//div[@id='content']//img[1]"
+					},
+					"assert": {
+						"operation": "equals",
+						"expected": "rgba(115, 86, 55, 1)",
+						"actual": {
+							"cssValue": "border-right-color"
+						}
+					}
+				},
+				{
+					"url": "orszaghaz.html",
+					"element": {
+						"byXPath": "//div[@id='content']//img[1]"
+					},
+					"assert": {
+						"operation": "equals",
+						"expected": "rgba(115, 86, 55, 1)",
+						"actual": {
+							"cssValue": "border-bottom-color"
+						}
+					}
+				},
+				{
+					"url": "orszaghaz.html",
+					"element": {
+						"byXPath": "//div[@id='content']//img[1]"
+					},
+					"assert": {
+						"operation": "equals",
+						"expected": "3px",
+						"actual": {
+							"cssValue": "border-left-width"
+						}
+					}
+				},
+				{
+					"url": "orszaghaz.html",
+					"element": {
+						"byXPath": "//div[@id='content']//img[1]"
+					},
+					"assert": {
+						"operation": "equals",
+						"expected": "3px",
+						"actual": {
+							"cssValue": "border-top-width"
+						}
+					}
+				},
+				{
+					"url": "orszaghaz.html",
+					"element": {
+						"byXPath": "//div[@id='content']//img[1]"
+					},
+					"assert": {
+						"operation": "equals",
+						"expected": "3px",
+						"actual": {
+							"cssValue": "border-right-width"
+						}
+					}
+				},
+				{
+					"url": "orszaghaz.html",
+					"element": {
+						"byXPath": "//div[@id='content']//img[1]"
+					},
+					"assert": {
+						"operation": "equals",
+						"expected": "3px",
+						"actual": {
+							"cssValue": "border-bottom-width"
+						}
+					}
+				},
+				{
+					"url": "orszaghaz.html",
+					"element": {
+						"byXPath": "//div[@id='content']//img[1]"
+					},
+					"assert": {
+						"operation": "equals",
+						"expected": "solid",
+						"actual": {
+							"cssValue": "border-left-style"
+						}
+					}
+				},
+				{
+					"url": "orszaghaz.html",
+					"element": {
+						"byXPath": "//div[@id='content']//img[1]"
+					},
+					"assert": {
+						"operation": "equals",
+						"expected": "solid",
+						"actual": {
+							"cssValue": "border-top-style"
+						}
+					}
+				},
+				{
+					"url": "orszaghaz.html",
+					"element": {
+						"byXPath": "//div[@id='content']//img[1]"
+					},
+					"assert": {
+						"operation": "equals",
+						"expected": "solid",
+						"actual": {
+							"cssValue": "border-right-style"
+						}
+					}
+				},
+				{
+					"url": "orszaghaz.html",
+					"element": {
+						"byXPath": "//div[@id='content']//img[1]"
+					},
+					"assert": {
+						"operation": "equals",
+						"expected": "solid",
+						"actual": {
+							"cssValue": "border-bottom-style"
+						}
+					}
+				}
+			]
+		}
+		
+	]
+}
