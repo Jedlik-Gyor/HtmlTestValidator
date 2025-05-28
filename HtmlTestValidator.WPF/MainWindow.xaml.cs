@@ -72,7 +72,7 @@ namespace HtmlTestValidator
             object lockObject = new object();
             var docker = rbLocalDocker.IsChecked == true;
             //foreach (var evaluation in evaluations)
-            var options = new ParallelOptions { MaxDegreeOfParallelism = docker ? 5 : 1 };
+            var options = new ParallelOptions { MaxDegreeOfParallelism = docker ? 1 : 1 };
             await Parallel.ForEachAsync(evaluations, options, async (evaluation, token) =>
             {
                 File.WriteAllText($"feldolgozás - {evaluation.Name}.log", "");

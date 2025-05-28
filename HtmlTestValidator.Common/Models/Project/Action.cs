@@ -25,6 +25,31 @@ namespace HtmlTestValidator.Models.Project
         }
     }
 
+    public class ActionClickElement : Action
+    {
+        public override void DoIt(WebDriver webDriver, IWebElement webElement)
+        {
+            var actions = new OpenQA.Selenium.Interactions.Actions(webDriver);
+            actions.Click(webElement).Perform();
+        }
+    }
+
+    public class ActionRunJsCommand : Action
+    {
+        [JsonProperty("command")]
+        public string JSCommand { get; set; }
+
+        public override void DoIt(WebDriver webDriver, IWebElement webElement)
+        {
+            WebDriver driver = (WebDriver)webElement.GetType().GetProperty("WrappedDriver").GetValue(webElement, null);
+            if (string.IsNullOrEmpty(JSCommand))
+                throw new ArgumentException("Command cannot be null or empty");
+            driver.ExecuteScript(JSCommand);
+            Thread.Sleep(500); // Wait for the command to execute
+        }
+    }
+
+
     public class ActionClassConverter : DefaultContractResolver
     {
         protected override JsonConverter ResolveContractConverter(Type objectType)
@@ -49,7 +74,11 @@ namespace HtmlTestValidator.Models.Project
             JObject jo = JObject.Load(reader);
             if (jo["action"].Value<string>() == "moveToElement")
                 return JsonConvert.DeserializeObject<ActionMoveToElement>(jo.ToString(), SpecifiedSubclassConversion);
-
+            if (jo["action"].Value<string>() == "clickElement")
+                return JsonConvert.DeserializeObject<ActionClickElement>(jo.ToString(), SpecifiedSubclassConversion);
+            if (jo["action"].Value<string>() == "runJsCommand")
+                return JsonConvert.DeserializeObject<ActionRunJsCommand>(jo.ToString(), SpecifiedSubclassConversion);
+            
             throw new NotImplementedException();
         }
 

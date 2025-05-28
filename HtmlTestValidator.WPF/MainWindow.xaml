@@ -48,8 +48,8 @@
             </Grid.ColumnDefinitions>
             <Label Content="Futtatás helye:" VerticalAlignment="Center"/>
             <StackPanel Grid.Column="1" VerticalAlignment="Center" Orientation="Horizontal">
-                <RadioButton Name="rbKubernetes" Content="Kubernetes - selenium hub" VerticalContentAlignment="Center" IsChecked="True"/>
-                <RadioButton Name="rbLocalDocker" Content="Lokális docker - selenium hub" VerticalContentAlignment="Center" Margin="20 0 0 0"/>
+                <RadioButton Name="rbKubernetes" Content="Kubernetes - selenium hub" VerticalContentAlignment="Center" />
+                <RadioButton Name="rbLocalDocker" Content="Lokális docker - selenium hub" VerticalContentAlignment="Center" Margin="20 0 0 0" IsChecked="True"/>
             </StackPanel>
         </Grid>
 

@@ -60,6 +60,32 @@ namespace HtmlTestValidator.Models.Project
 
     }
 
+    public class AssertionGreaterThan : Assertion
+    {
+        [JsonProperty("value")]
+        public Decimal Value { get; set; }
+        [JsonProperty("actual")]
+        public AssertActual Actual { get; set; }
+
+        public override bool Assert(IWebElement webElement, Action<string> logger)
+        {
+            var currentValue = Convert.ToDecimal(Actual.GetValue(webElement));
+            if (logger != null)
+            {
+                logger($"\t\t\tNagyobb-e vizsgálat");
+                logger($"\t\t\t\tÉrték (aminél nagyobbat várunk): {Value}");
+                logger($"\t\t\t\tAktuális érték: {currentValue}");
+            }
+            return currentValue > Value;
+        }
+
+        public override bool Assert(ReadOnlyCollection<IWebElement> webElement, Action<string> logger)
+        {
+            return false;
+        }
+
+    }
+
     public class AssertionCount : Assertion
     {
         [JsonProperty("expected")]
@@ -195,7 +221,7 @@ namespace HtmlTestValidator.Models.Project
             return false;
         }
     }
-
+    
     public class AssertionHtmlValidation : Assertion
     {
         [JsonProperty("actual")]
@@ -303,7 +329,9 @@ namespace HtmlTestValidator.Models.Project
                 return JsonConvert.DeserializeObject<AssertionHtmlValidation>(jo.ToString(), SpecifiedSubclassConversion);
             if (jo["operation"].Value<string>() == "cssvalidation")
                 return JsonConvert.DeserializeObject<AssertionCssValidation>(jo.ToString(), SpecifiedSubclassConversion);
-
+            if (jo["operation"].Value<string>() == "greater")
+                return JsonConvert.DeserializeObject<AssertionGreaterThan>(jo.ToString(), SpecifiedSubclassConversion);
+            
             throw new NotImplementedException();
         }
 

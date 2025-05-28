@@ -54,6 +54,23 @@ namespace HtmlTestValidator.Models.Project
         }
     }
 
+    public class AssertActualJSCommand : AssertActual
+    {
+        [JsonProperty("jsCommand")]
+        public string JSCommand { get; set; }
+
+        public override string GetValue(IWebElement webElement)
+        {
+            WebDriver driver = (WebDriver)webElement.GetType().GetProperty("WrappedDriver").GetValue(webElement, null);
+            if (string.IsNullOrEmpty(JSCommand))
+                throw new ArgumentException("JSCommand cannot be null or empty");
+            if (JSCommand.StartsWith("return "))
+                return driver.ExecuteScript(JSCommand).ToString();
+            else
+                return driver.ExecuteScript("return " + JSCommand).ToString();
+        }
+    }
+
     public class AssertActualClassConverter : DefaultContractResolver
     {
         protected override JsonConverter ResolveContractConverter(Type objectType)
@@ -84,7 +101,9 @@ namespace HtmlTestValidator.Models.Project
                 return JsonConvert.DeserializeObject<AssertActualTagName>(jo.ToString(), SpecifiedSubclassConversion);
             if (jo.ContainsKey("cssValue"))
                 return JsonConvert.DeserializeObject<AssertActualCssValue>(jo.ToString(), SpecifiedSubclassConversion);
-            
+            if (jo.ContainsKey("jsCommand"))
+                return JsonConvert.DeserializeObject<AssertActualJSCommand>(jo.ToString(), SpecifiedSubclassConversion);
+
             throw new NotImplementedException();
         }
 
